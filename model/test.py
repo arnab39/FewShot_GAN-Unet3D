@@ -16,7 +16,12 @@ from preprocess import *
 
 F = tf.app.flags.FLAGS
 
-def trained_dis_network(patch, phase, reuse=False):
+def save_image(direc,i,num):
+  img = nib.Nifti1Image(i, None)
+  imgname = 'outputimageunetganFM'+str(num)+'_2.nii.gz'
+  nib.save(img, os.path.join(direc,imgname))
+
+def trained_dis_network(patch, reuse=False):
     with tf.variable_scope('D') as scope:
       if reuse:
         scope.reuse_variables()
@@ -55,13 +60,13 @@ def trained_dis_network(patch, phase, reuse=False):
 
       return tf.nn.softmax(h14)
 
+
 def test(patch_shape,extraction_step):
   
   with tf.Graph().as_default():
     test_patches = tf.placeholder(tf.float32, [F.batch_size, patch_shape[0], patch_shape[1],
                                              patch_shape[2], F.num_mod], name='real_patches')
-    phase = tf.placeholder(tf.bool)
-    output_soft = trained_dis_network(test_patches, phase, reuse=None)
+    output_soft = trained_dis_network(test_patches, reuse=None)
 
     output=tf.argmax(output_soft, axis=-1)
     print("Output Patch Shape:",output.get_shape())
@@ -70,7 +75,7 @@ def test(patch_shape,extraction_step):
     saver = tf.train.Saver()
     with tf.Session() as sess:
       try:
-        load_model(F.best_checkpoint_dir_val, sess, saver)
+        load_model(F.best_checkpoint_dir, sess, saver)
         print(" Checkpoint loaded succesfully!....\n")
       except:
         print(" [!] Checkpoint loading failed!....\n")
@@ -88,7 +93,7 @@ def test(patch_shape,extraction_step):
       print("Total number of Batches: ",total_batches)
       for batch in range(total_batches):
         patches_feed = patches_test[batch*F.batch_size:(batch+1)*F.batch_size,:,:,:,:]
-        preds = sess.run(output, feed_dict={test_patches:patches_feed,phase:F.training})
+        preds = sess.run(output, feed_dict={test_patches:patches_feed})
         predictions_test[batch*F.batch_size:(batch+1)*F.batch_size,:,:,:]=preds
         print(("Processed_batch:[%8d/%8d]")%(batch,total_batches))
 
@@ -105,7 +110,18 @@ def test(patch_shape,extraction_step):
                                                 np.min(images_pred), np.max(images_pred),
                                                 np.mean(images_pred),np.mean(labels_test))
 
-
+      cur_dir='/home/AP84830/Current_work_3DGANISEG/GAN_unet3D/'
+      for i in range(F.number_test_images):
+        pred2d=np.reshape(images_pred[i],(144*192*256))
+        lab2d=np.reshape(labels_test[i],(144*192*256))
+        save_image(cur_dir+F.results_dir,images_pred[i],F.number_train_images+i+2)
+        F1_score = f1_score(lab2d, pred2d,[0,1,2,3],average=None)
+        print("For image ",i)
+        print("Testing Dice Coefficient.... ")
+        print("Background:",F1_score[0])
+        print("CSF:",F1_score[1])
+        print("GM:",F1_score[2])
+        print("WM:",F1_score[3])
 
       pred2d=np.reshape(images_pred,(images_pred.shape[0]*144*192*256))
       lab2d=np.reshape(labels_test,(labels_test.shape[0]*144*192*256))
@@ -116,6 +132,9 @@ def test(patch_shape,extraction_step):
       print("CSF:",F1_score[1])
       print("GM:",F1_score[2])
       print("WM:",F1_score[3])
+
+
+
   return
 
 
