@@ -279,7 +279,7 @@ class model(object):
         feed_dict = {self.patches_lab:patches_lab,self.patches_unlab:patches_unlab,
                                     self.z_gen:sample_z_gen,self.labels:labels, self.phase: True} 
 
-        # Evaluate loss for plotting/printing purposes   
+        # Evaluate losses for plotting/printing purposes   
         d_loss_lab = self.d_loss_lab.eval(feed_dict)
         d_loss_unlab_true = self.true_loss.eval(feed_dict)
         d_loss_unlab_fake = self.fake_loss.eval(feed_dict)
@@ -310,8 +310,9 @@ class model(object):
       print('\n\n')
 
       total_batches = int(patches_val.shape[0]/F.batch_size)
-      print("Total number of Batches: ",total_batches)
+      print("Total number of batches for validation: ",total_batches)
 
+      # Prediction of validation patches
       for batch in range(total_batches):
         patches_feed = patches_val[batch*F.batch_size:(batch+1)*F.batch_size,:,:,:,:]
         labels_feed = labels_val_patch[batch*F.batch_size:(batch+1)*F.batch_size,:,:,:]
@@ -324,6 +325,7 @@ class model(object):
         print(("Validated Patch:[%8d/%8d]")%(batch,total_batches))
         total_val_loss=total_val_loss+val_loss
 
+      # To compute average patchvise validation loss(cross entropy loss)
       avg_val_loss=total_val_loss/(total_batches*1.0)
 
       print("All validation patches Predicted")
@@ -331,7 +333,7 @@ class model(object):
       print("Shape of predictions_val, min and max:",predictions_val.shape,np.min(predictions_val),
                                                                         np.max(predictions_val))
 
-
+      # To stitch back the patches into an entire image
       val_image_pred = recompose3D_overlap(predictions_val,144, 192, 256, self.extraction_step[0],
                                          self.extraction_step[1], self.extraction_step[2])
       val_image_pred = val_image_pred.astype('uint8')
@@ -345,7 +347,7 @@ class model(object):
       pred2d=np.reshape(val_image_pred,(val_image_pred.shape[0]*144*192*256))
       lab2d=np.reshape(labels_val,(labels_val.shape[0]*144*192*256))
 
-      #For printing the validation results
+      # For printing the validation results
       F1_score = f1_score(lab2d, pred2d,[0,1,2,3],average=None)
       print("Validation Dice Coefficient.... ")
       print("Background:",F1_score[0])
@@ -353,13 +355,13 @@ class model(object):
       print("GM:",F1_score[2])
       print("WM:",F1_score[3])
 
-      #Save the best model
+      # To Save the best model
       if(max_par<(F1_score[2]+F1_score[3])):
         max_par=(F1_score[2]+F1_score[3])
         save_model(F.best_checkpoint_dir, self.sess, self.saver)
         print("Best checkpoint updated from validation results.")
 
-      #To save the losses for plotting 
+      # To save the losses for plotting 
       print("Average Validation Loss:",avg_val_loss)
       with open('Val_loss_GAN.txt', 'a') as f:
         f.write('%.2e \n' % avg_val_loss)

@@ -58,6 +58,7 @@ def main(_):
     os.makedirs(FLAGS.best_checkpoint_dir)
 
 
+  # To configure the GPU fraction
   gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=FLAGS.gpu_frac)
 
   #Configuration of extracted training and testing patches
@@ -66,13 +67,13 @@ def main(_):
   testing_extraction_shape=(8,8,8)
 
   if FLAGS.training:
-    #for training the network
+    # For training the network
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
       network = model(sess,patch_shape,extraction_step)
       network.build_model()
       network.train()
   if FLAGS.testing:
-      #for testing the network
+      # For testing the trained network
       test(patch_shape,testing_extraction_shape)
 
 
