@@ -39,7 +39,7 @@ def load_model(checkpoint_dir, sess, saver):
     return False
 
 """
-To recompose the image from patches
+To recompose an array of 3D images from patches
 """
 def recompose3D_overlap(preds, img_h, img_w, img_d, stride_h, stride_w, stride_d):
   patch_h = preds.shape[1]

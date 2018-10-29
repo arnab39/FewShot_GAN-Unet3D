@@ -17,8 +17,6 @@ F = tf.app.flags.FLAGS
 seed = 7
 np.random.seed(seed)
 
-#actual_data_directory='/home/AP84830/Current_work_3DGANISEG/data/iSEG'
-#preprocesses_data_directory='/home/AP84830/Current_work_3DGANISEG/data/iSEG_preprocessed'
 all_modalities={'T1','T2'}
 
 
@@ -60,7 +58,9 @@ def normalise(case_idx, input_name, in_dir, out_dir,copy=False):
 
 
 
-
+"""
+To extract patches from a 3D image
+"""
 def extract_patches(volume, patch_shape, extraction_step,datype='float32'):
   patch_h, patch_w, patch_d = patch_shape[0], patch_shape[1], patch_shape[2]
   stride_h, stride_w, stride_d = extraction_step[0], extraction_step[1], extraction_step[2]
@@ -83,7 +83,9 @@ def extract_patches(volume, patch_shape, extraction_step,datype='float32'):
   assert(k==N_patches_img)
   return raw_patch_martrix
 
-
+"""
+To extract labeled patches from array of 3D labeled images
+"""
 def get_patches_lab(T1_vols, T2_vols, label_vols, extraction_step,
                     patch_shape,validating,testing,num_images_training):
     patch_shape_1d=patch_shape[0]
@@ -117,17 +119,18 @@ def get_patches_lab(T1_vols, T2_vols, label_vols, extraction_step,
 
         y[y_length:, :, :, :] = label_patches
 
-        # Sampling strategy: reject samples which labels are only zeros
-        T1_train = extract_patches(T1_vols[idx], patch_shape, extraction_step,
-        														datype="float32")
+        # Sampling strategy: reject samples which labels are mostly 0 and have less than 6000 nonzero elements
+        T1_train = extract_patches(T1_vols[idx], patch_shape, extraction_step,datype="float32")
         x[y_length:, :, :, :, 0] = T1_train[valid_idxs]
         
-        # Sampling strategy: reject samples which labels are only zeros
-        T2_train = extract_patches(T2_vols[idx], patch_shape, extraction_step
-        														,datype="float32")
+        # Sampling strategy: reject samples which labels are mostly 0 and have less than 6000 nonzero elements
+        T2_train = extract_patches(T2_vols[idx], patch_shape, extraction_step,datype="float32")
         x[y_length:, :, :, :, 1] = T2_train[valid_idxs]
     return x, y
 
+"""
+To preprocess the labeled training data
+"""
 def preprocess_dynamic_lab(dir,num_classes, extraction_step,patch_shape,num_images_training=2,
                                 validating=False,testing=False,num_images_testing=7):
     if testing:
@@ -184,41 +187,10 @@ def preprocess_dynamic_lab(dir,num_classes, extraction_step,patch_shape,num_imag
     else:
         return x, y
 
-def preprocess_dynamic_test(dir,num_classes, extraction_step,patch_shape,num_images_training=2,
-                                validating=False,testing=False,num_images_testing=7):
-    print("Testing")
-    r1=num_images_training+2
-    r2=num_images_training+num_images_testing+2
-    c=num_images_training+1
-    T1_vols = np.empty((num_images_testing, 144, 192, 256),dtype="float32")
-    T2_vols = np.empty((num_images_testing, 144, 192, 256),dtype="float32")
-    label_vols = np.empty((num_images_testing, 144, 192, 256),dtype="uint8")
-    for case_idx in range(r1, r2) :
-        print(case_idx)
-        T1_vols[(case_idx-c-1), :, :, :] = read_vol(case_idx, 'T1', dir)
-        T2_vols[(case_idx-c-1), :, :, :] = read_vol(case_idx, 'T2', dir)
-        label_vols[(case_idx-c-1), :, :, :] = read_vol(case_idx, 'label', dir)
-    T1_mean = T1_vols.mean()
-    T1_std = T1_vols.std()
-    T1_vols = (T1_vols - T1_mean) / T1_std
-    T2_mean = T2_vols.mean()
-    T2_std = T2_vols.std()
-    T2_vols = (T2_vols - T2_mean) / T2_std
 
-    for i in range(T1_vols.shape[0]):
-        T1_vols[i] = ((T1_vols[i] - np.min(T1_vols[i])) / 
-                                    (np.max(T1_vols[i])-np.min(T1_vols[i])))*255
-    for i in range(T2_vols.shape[0]):
-        T2_vols[i] = ((T2_vols[i] - np.min(T2_vols[i])) / 
-                                    (np.max(T2_vols[i])-np.min(T2_vols[i])))*255    
-    T1_vols = T1_vols/127.5 -1.
-    T2_vols = T2_vols/127.5 -1.
-    x,y=get_patches_lab(T1_vols,T2_vols,label_vols,extraction_step,patch_shape,validating=False,
-                                testing=False,num_images_training=num_images_training)
-    print("Total Extracted Labelled Patches Shape:",x.shape,y.shape)
-    return x, y
-
-
+"""
+To extract labeled patches from array of 3D ulabeled images
+"""
 def get_patches_unlab(T1_vols, T2_vols, extraction_step,patch_shape,dir):
     patch_shape_1d=patch_shape[0]
     # Extract patches from input volumes and ground truth
@@ -232,22 +204,23 @@ def get_patches_unlab(T1_vols, T2_vols, extraction_step,patch_shape,dir):
         label_patches = extract_patches(label_ref, patch_shape, extraction_step)
 
         # Select only those who are important for processing
+        # Sampling strategy: reject samples which labels are mostly 0 and have less than 6000 nonzero elements
         valid_idxs = np.where(np.count_nonzero(label_patches, axis=(1, 2, 3)) > 6000)
 
         label_patches = label_patches[valid_idxs]
         x = np.vstack((x, np.zeros((len(label_patches), patch_shape_1d, 
                                             patch_shape_1d, patch_shape_1d, 2))))
 
-        # Sampling strategy: reject samples which labels are only zeros
-        T1_train = extract_patches(T1_vols[idx], patch_shape, extraction_step, datype="float32")
+        T1_train = extract_patches(T1_vols[idx], patch_shape, extraction_step,datype="float32")
         x[x_length:, :, :, :, 0] = T1_train[valid_idxs]
         
-        # Sampling strategy: reject samples which labels are only zeros
-        T2_train = extract_patches(T2_vols[idx], patch_shape, extraction_step, datype="float32")
+        T2_train = extract_patches(T2_vols[idx], patch_shape, extraction_step,datype="float32")
         x[x_length:, :, :, :, 1] = T2_train[valid_idxs]
     return x
 
-
+"""
+To preprocess the unlabeled training data
+"""
 def preprocess_dynamic_unlab( dir,extraction_step,patch_shape,num_images_training_unlab):
     T1_vols = np.empty((num_images_training_unlab, 144, 192, 256),dtype="float32")
     T2_vols = np.empty((num_images_training_unlab, 144, 192, 256),dtype="float32")
@@ -274,7 +247,7 @@ def preprocess_dynamic_unlab( dir,extraction_step,patch_shape,num_images_trainin
     return x
 
 
-def preprocess_static( org_dir, prepro_dir, overwrite=False):
+def preprocess_static( org_dir, prepro_dir, dataset="labeled", overwrite=False):
     if not os.path.exists(prepro_dir):
         os.makedirs(prepro_dir)
     for subject_folder in glob.glob(os.path.join(org_dir, "*", "*")):
@@ -285,14 +258,20 @@ def preprocess_static( org_dir, prepro_dir, overwrite=False):
             if not os.path.exists(new_subject_folder) or overwrite:
                 if not os.path.exists(new_subject_folder):
                     os.makedirs(new_subject_folder)
-
-    for case_idx in range(11, 23) :
-        normalise(case_idx, 'T1',actual_data_directory,preprocesses_data_directory)
-        normalise(case_idx, 'T2',actual_data_directory,preprocesses_data_directory)
-        #normalise(case_idx, 'label',actual_data_directory,preprocesses_data_directory,
-        #               copy=True)
-
-
+    if(dataset=="labeled"):
+        for case_idx in range(1, 11) :
+            normalise(case_idx, 'T1',actual_data_directory,preprocesses_data_directory)
+            normalise(case_idx, 'T2',actual_data_directory,preprocesses_data_directory)
+            normalise(case_idx, 'label',actual_data_directory,preprocesses_data_directory,
+                           copy=True)
+    else:
+        for case_idx in range(11, 24) :
+            normalise(case_idx, 'T1',actual_data_directory,preprocesses_data_directory)
+            normalise(case_idx, 'T2',actual_data_directory,preprocesses_data_directory)
+            
+"""
+dataset class for preparing training data of basic U-Net
+"""
 class dataset(object):
   def __init__(self,num_classes, extraction_step, number_images_training, batch_size, patch_shape,data_directory):
     # Extract labelled and unlabelled patches
@@ -314,11 +293,12 @@ class dataset(object):
              self.label[i*self.batch_size:(i+1)*self.batch_size]
 
 
-
+"""
+dataset_badGAN class for preparing data of our model
+"""
 class dataset_badGAN(object):
   def __init__(self,num_classes, extraction_step, number_images_training, batch_size, 
                     patch_shape, number_unlab_images_training,data_directory):
-    #print("INSIDE DATASET BADGAN PREPROCESS")
     # Extract labelled and unlabelled patches,
     self.batch_size=batch_size
     self.data_lab, self.label = preprocess_dynamic_lab(
