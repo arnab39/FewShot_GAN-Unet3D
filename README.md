@@ -7,8 +7,6 @@ This repository contain the tensorflow implementation of the model we proposed i
 
 <br>
 <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Subject9.jpg" />
-<br>
-<br>
 <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Subject10.jpg" />
 <br>
 
