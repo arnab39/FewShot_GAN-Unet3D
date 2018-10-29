@@ -14,13 +14,18 @@ from utils import *
 from preprocess import *
 
 
+
 F = tf.app.flags.FLAGS
 
+
+# Function to save predicted images as .nii.gz file in results folder
 def save_image(direc,i,num):
   img = nib.Nifti1Image(i, None)
-  imgname = 'outputimageunetganFM'+str(num)+'_2.nii.gz'
+  imgname = 'outputimage_GANbasedunet_'+str(num)+'.nii.gz'
   nib.save(img, os.path.join(direc,imgname))
 
+
+# Sane discriminator network as in model file
 def trained_dis_network(patch, reuse=False):
     with tf.variable_scope('D') as scope:
       if reuse:
@@ -60,18 +65,26 @@ def trained_dis_network(patch, reuse=False):
 
       return tf.nn.softmax(h14)
 
-
+"""
+ Function to test the model and evaluate the predicted images
+ Parameters:
+ * patch_shape - shape of the patch
+ * extraction_step - stride while extracting patches
+"""
 def test(patch_shape,extraction_step):
   
   with tf.Graph().as_default():
     test_patches = tf.placeholder(tf.float32, [F.batch_size, patch_shape[0], patch_shape[1],
                                              patch_shape[2], F.num_mod], name='real_patches')
+
+    # Define the network
     output_soft = trained_dis_network(test_patches, reuse=None)
 
+    # To convert from one hat form
     output=tf.argmax(output_soft, axis=-1)
     print("Output Patch Shape:",output.get_shape())
 
-
+    # To load the saved checkpoint
     saver = tf.train.Saver()
     with tf.Session() as sess:
       try:
@@ -80,17 +93,23 @@ def test(patch_shape,extraction_step):
       except:
         print(" [!] Checkpoint loading failed!....\n")
         return
-      patches_test, labels_test = preprocess_dynamic_lab(F.preprocesses_data_directory,
+
+      # Extract patches from images
+      patches_test, labels_test = preprocess_dynamic_lab(F.data_directory,
                                     F.num_classes,extraction_step,patch_shape,
                                     F.number_train_images,validating=F.training,
                                     testing=F.testing,num_images_testing=F.number_test_images)
       total_batches = int(patches_test.shape[0]/F.batch_size)
+
+      # Array to store the prediction results
       predictions_test = np.zeros((patches_test.shape[0],patch_shape[0], patch_shape[1],
                                              patch_shape[2]))
 
       print("max and min of patches_test:",np.min(patches_test),np.max(patches_test))
 
       print("Total number of Batches: ",total_batches)
+
+      # Batch wise prediction
       for batch in range(total_batches):
         patches_feed = patches_test[batch*F.batch_size:(batch+1)*F.batch_size,:,:,:,:]
         preds = sess.run(output, feed_dict={test_patches:patches_feed})
@@ -102,7 +121,7 @@ def test(patch_shape,extraction_step):
       print("Shape of predictions_test, min and max:",predictions_test.shape,np.min(predictions_test),
                                                                         np.max(predictions_test))
 
-
+      #To stitch the image back
       images_pred = recompose3D_overlap(predictions_test,144, 192, 256, extraction_step[0],
                                                         extraction_step[1],extraction_step[2])
 
@@ -110,19 +129,15 @@ def test(patch_shape,extraction_step):
                                                 np.min(images_pred), np.max(images_pred),
                                                 np.mean(images_pred),np.mean(labels_test))
 
-      cur_dir='/home/AP84830/Current_work_3DGANISEG/GAN_unet3D/'
+
+      # To save the images
       for i in range(F.number_test_images):
         pred2d=np.reshape(images_pred[i],(144*192*256))
         lab2d=np.reshape(labels_test[i],(144*192*256))
-        save_image(cur_dir+F.results_dir,images_pred[i],F.number_train_images+i+2)
-        F1_score = f1_score(lab2d, pred2d,[0,1,2,3],average=None)
-        print("For image ",i)
-        print("Testing Dice Coefficient.... ")
-        print("Background:",F1_score[0])
-        print("CSF:",F1_score[1])
-        print("GM:",F1_score[2])
-        print("WM:",F1_score[3])
+        save_image(F.results_dir,images_pred[i],F.number_train_images+i+2)
 
+
+      # Evaluation
       pred2d=np.reshape(images_pred,(images_pred.shape[0]*144*192*256))
       lab2d=np.reshape(labels_test,(labels_test.shape[0]*144*192*256))
 

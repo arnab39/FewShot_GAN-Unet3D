@@ -218,7 +218,8 @@ class model(object):
     # Instantiate the dataset class
     data = dataset_badGAN(num_classes=F.num_classes,extraction_step=self.extraction_step, 
               number_images_training=F.number_train_images,batch_size=F.batch_size, 
-              patch_shape=self.patch_shape,number_unlab_images_training=F.number_train_unlab_images)
+              patch_shape=self.patch_shape,number_unlab_images_training=F.number_train_unlab_images,
+              data_directory=F.data_directory)
 
     # Optimizer operations
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
@@ -244,7 +245,7 @@ class model(object):
       print("\n [*] Checkpoint load not required.")
 
     # Load the validation data
-    patches_val, labels_val_patch, labels_val = preprocess_dynamic_lab(F.preprocesses_data_directory,
+    patches_val, labels_val_patch, labels_val = preprocess_dynamic_lab(F.data_directory,
                                     F.num_classes,self.extraction_step,self.patch_shape,
                                     F.number_train_images,validating=F.training,
                                     testing=F.testing,num_images_testing=F.number_test_images)

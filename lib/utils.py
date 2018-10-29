@@ -38,7 +38,9 @@ def load_model(checkpoint_dir, sess, saver):
   else:
     return False
 
-
+"""
+To recompose the image from patches
+"""
 def recompose3D_overlap(preds, img_h, img_w, img_d, stride_h, stride_w, stride_d):
   patch_h = preds.shape[1]
   patch_w = preds.shape[2]
@@ -55,13 +57,13 @@ def recompose3D_overlap(preds, img_h, img_w, img_d, stride_h, stride_w, stride_d
   N_full_imgs = preds.shape[0]//N_patches_img
   print("According to the dimension inserted, there are " \
           +str(N_full_imgs) +" full images (of " +str(img_h)+"x" +str(img_w)+"x" +str(img_d) +" each)")
-   #itialize to zero mega array with sum of Probabilities
+  # itialize to zero mega array with sum of Probabilities
   raw_pred_martrix = np.zeros((N_full_imgs,img_h,img_w,img_d)) 
   raw_sum = np.zeros((N_full_imgs,img_h,img_w,img_d))
   final_matrix = np.zeros((N_full_imgs,img_h,img_w,img_d),dtype='uint16')
 
   k = 0 
-  #iterator over all the patches
+  # iterator over all the patches
   for i in range(N_full_imgs):
     for h in range((img_h-patch_h)//stride_h+1):
       for w in range((img_w-patch_w)//stride_w+1):

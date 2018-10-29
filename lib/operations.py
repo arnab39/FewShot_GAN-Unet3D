@@ -4,8 +4,8 @@ F = tf.flags.FLAGS
 
 
 def gaussian_nll(mu, log_sigma, noise):
-    NLL = tf.reduce_sum(log_sigma, 1) + tf.reduce_sum(((noise - mu)/(1e-8 + tf.exp(log_sigma)))**2,1)/2.
-    print(NLL.shape)
+    NLL = tf.reduce_sum(log_sigma, 1) + \
+              tf.reduce_sum(((noise - mu)/(1e-8 + tf.exp(log_sigma)))**2,1)/2.
     return tf.reduce_mean(NLL)
 
 
