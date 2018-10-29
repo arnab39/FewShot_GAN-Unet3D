@@ -4,7 +4,7 @@ This repository contain the tensorflow implementation of the model we proposed i
 ## Some results from our paper
 
 * Visual comparison of the segmentation by each model, for two test subjects of the iSEG-2017 dataset, when training with different numbers of labeled examples.
-<p float="left">
+<p float="center">
   <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Subject9.jpg" width="400" />
   <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Subject10.jpg" width="400" /> 
 </p>
