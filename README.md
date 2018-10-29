@@ -3,13 +3,16 @@ This repository contain the tensorflow implementation of the model we proposed i
 
 ## Some results from our paper
 
-* Different views of a smoothed version of contours provided by our automatic segmentation system. In these images, the thalamus, caudate, putamen and pallidum are respectively depicted in yellow, cyan, red and green.
+* Visual comparison of the segmentation by each model, for two test subjects of the iSEG-2017 dataset, when training with different numbers of labeled examples.
 
 <br>
-<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/ganwar_mod.jpg" />
+<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/subject9.jpg" />
+<br>
+<br>
+<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/subject10.jpg" />
 <br>
 
-* Feature map activations in all convolutional layers of the FCNN (right), obtained for a given patch of the input MRI image (left). Each column corresponds to a different convolutional layer, from shallow to deeper, and each image in a row to a features map activation randomly selected in the layer.
+* Segmentation of Subject 10 of the iSEG-2017 dataset predicted by different GAN-based models, when trained with 2 labeled images. The red box highlights a region in the ground truth where all these models give noticeable differences.
 <br>
 <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/ganwar_mod.jpg" />
 <br>
