@@ -1,7 +1,7 @@
 import os
 import numpy as np
 import tensorflow as tf
-import pdb
+#import pdb
 
 F = tf.app.flags.FLAGS
 
