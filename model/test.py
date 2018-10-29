@@ -25,8 +25,15 @@ def save_image(direc,i,num):
   nib.save(img, os.path.join(direc,imgname))
 
 
-# Sane discriminator network as in model file
+# Same discriminator network as in model file
 def trained_dis_network(patch, reuse=False):
+    """
+    Parameters:
+    * patch - input image for the network
+    * reuse - boolean variable to reuse weights
+    Returns: 
+    * softmax of logits 
+    """
     with tf.variable_scope('D') as scope:
       if reuse:
         scope.reuse_variables()
@@ -94,7 +101,7 @@ def test(patch_shape,extraction_step):
         print(" [!] Checkpoint loading failed!....\n")
         return
 
-      # Extract patches from images
+      # Get patches from test images
       patches_test, labels_test = preprocess_dynamic_lab(F.data_directory,
                                     F.num_classes,extraction_step,patch_shape,
                                     F.number_train_images,validating=F.training,
@@ -121,7 +128,7 @@ def test(patch_shape,extraction_step):
       print("Shape of predictions_test, min and max:",predictions_test.shape,np.min(predictions_test),
                                                                         np.max(predictions_test))
 
-      #To stitch the image back
+      # To stitch the image back
       images_pred = recompose3D_overlap(predictions_test,144, 192, 256, extraction_step[0],
                                                         extraction_step[1],extraction_step[2])
 

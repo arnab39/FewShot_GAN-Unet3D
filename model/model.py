@@ -163,6 +163,7 @@ class model(object):
 
     # Supervised loss
     # Weighted cross entropy loss (You can play with these values)
+    # Weights of different class are: Background- 0.33, CSF- 1.5, GM- 0.83, WM- 1.33
     class_weights = tf.constant([[0.33, 1.5, 0.83, 1.33]])
     weights = tf.reduce_sum(class_weights * self.labels_1hot, axis=-1)
     unweighted_losses = tf.nn.softmax_cross_entropy_with_logits_v2(logits=self.D_logits_lab, labels=self.labels_1hot)
