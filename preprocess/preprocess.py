@@ -9,7 +9,7 @@ from sklearn.feature_extraction.image import extract_patches as sk_extract_patch
 from sklearn.utils import shuffle
 import tensorflow as tf
 import scipy.misc
-import pdb
+#import pdb
 
 F = tf.app.flags.FLAGS
 
@@ -260,14 +260,14 @@ def preprocess_static( org_dir, prepro_dir, dataset="labeled", overwrite=False):
                     os.makedirs(new_subject_folder)
     if(dataset=="labeled"):
         for case_idx in range(1, 11) :
-            normalise(case_idx, 'T1',actual_data_directory,preprocesses_data_directory)
-            normalise(case_idx, 'T2',actual_data_directory,preprocesses_data_directory)
-            normalise(case_idx, 'label',actual_data_directory,preprocesses_data_directory,
+            normalise(case_idx, 'T1',org_dir,prepro_dir)
+            normalise(case_idx, 'T2',org_dir,prepro_dir)
+            normalise(case_idx, 'label',org_dir,prepro_dir,
                            copy=True)
     else:
         for case_idx in range(11, 24) :
-            normalise(case_idx, 'T1',actual_data_directory,preprocesses_data_directory)
-            normalise(case_idx, 'T2',actual_data_directory,preprocesses_data_directory)
+            normalise(case_idx, 'T1',org_dir,prepro_dir)
+            normalise(case_idx, 'T2',org_dir,prepro_dir)
             
 """
 dataset class for preparing training data of basic U-Net
