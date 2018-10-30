@@ -92,5 +92,5 @@ The following shows the model architecture of the proposed model. (Read our pape
 You can mail me at: sanu.arnab@gmail.com  
 If you use this code for your research, please consider citing the original paper:
 
-- Arnab Kumar Mondal, Jose Dolz, Christian Desrosiers. [Few-shot 3D Multi-modal Medical Image Segmentation using Generative Adversarial Learning](https://arxiv.org/abs/1810.12241) submitted in Medical Image Analysis, October 2018.
+- Arnab Kumar Mondal, Jose Dolz, Christian Desrosiers. [Few-shot 3D Multi-modal Medical Image Segmentation using Generative Adversarial Learning](https://arxiv.org/abs/1810.12241), submitted in Medical Image Analysis, October 2018.
 
