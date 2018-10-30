@@ -29,7 +29,7 @@ $ python
 * If you fail to install ANTs N4BiasFieldCorrection you can also skip the above preprocessing step and continue working with the original dataset. (Just change the data_directory flag to the original data directory while running the models)
 * You can run standard 3D U-Net & our proposed model(both Feature matching GAN and bad GAN) with this code and compare their performance.
 
-## How to run 3D U-Net?
+### How to run 3D U-Net?
 ```
 $ cd ../unet3D
 ```
@@ -49,7 +49,7 @@ $ python main_unet.py --testing
 * Note that the U-Net used here is modified according to the U-Net used in proposed model.(To stabilise the GAN training)
 * To use the original U-Net you need to change the replace network_dis with network(both networks are provided) in build_model function of class U-Net(in model_unet.py). 
  
-## How to run GAN based 3D U-Net?
+### How to run GAN based 3D U-Net?
 ```
 $ cd ../proposed_model
 ```
@@ -86,3 +86,11 @@ The following shows the model architecture of the proposed model. (Read our pape
 <br>
 <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/ganwar_mod.jpg" />
 <br>
+* More such results can be found in the paper.
+
+## Contact
+You can mail me at: sanu.arnab@gmail.com  
+If you use this code for your research, please consider citing the original paper:
+
+- Arnab Kumar Mondal, Jose Dolz, Christian Desrosiers. [Few-shot 3D Multi-modal Medical Image Segmentation using Generative Adversarial Learning](https://arxiv.org/abs/1810.12241) submitted in Medical Image Analysis, October 2018.
+
