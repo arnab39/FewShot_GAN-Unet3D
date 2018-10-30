@@ -70,8 +70,9 @@ $ python main_unet.py --testing
 
 ## Proposed model architecture
 The following shows the model architecture of the proposed model. (Read our paper for further details)
+
 <br>
-<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Diagram.jpg" />
+<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Diagram.jpg" width="800"/>
 <br>
 
 ## Some results from our paper
