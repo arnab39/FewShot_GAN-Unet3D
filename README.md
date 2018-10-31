@@ -17,7 +17,7 @@ We split the 10 labeled training data into training, validation and testing imag
 Rest of the 13 unlabeled testing images are only used for training the GAN based model. 
 
 ## How to use the code?
-* Download the iSEG-2017 data and place it in data folder. (You can mail me for the dataset)
+* Download the iSEG-2017 data and place it in data folder. (Visit [this](http://iseg2017.web.unc.edu/download/) link to download the data. You need to register for the challenge.)
 * To perform image wise normalization and correction( run preprocess_static once more by changing dataset argument from "labeled" to "unlabeled"):
 ```
 $ cd preprocess
