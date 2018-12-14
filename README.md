@@ -64,7 +64,7 @@ $ python main.py --training --badGAN
 ```
 * To run testing
 ```
-$ python main_unet.py --testing
+$ python main.py --testing
 ``` 
 * Once you run both the model you can compare the difference between their perfomance when 1 or 2 training images are available. 
 
