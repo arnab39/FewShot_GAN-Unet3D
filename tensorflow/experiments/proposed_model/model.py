@@ -1,11 +1,11 @@
 from __future__ import division
 import os
-import pickle 
+import pickle
 import tensorflow as tf
 
 import sys
-sys.path.insert(0, '../preprocess/')
-sys.path.insert(0, '../lib/')
+sys.path.insert(0, '../../preprocess/')
+sys.path.insert(0, '../../lib/')
 
 from operations import *
 from utils import *
@@ -37,10 +37,10 @@ class model(object):
     Parameters:
     * patch - input image for the network
     * reuse - boolean variable to reuse weights
-    Returns: 
+    Returns:
     * logits
     * softmax of logits
-    * features extracted from encoding path 
+    * features extracted from encoding path
     """
     with tf.variable_scope('D') as scope:
       if reuse:
@@ -65,7 +65,7 @@ class model(object):
       up1 = tf.concat([h5,up1],4)
       h8 = lrelu(conv3d_WN(up1, 128, name='d_h8_conv'))
       h9 = lrelu(conv3d_WN(h8, 128, name='d_h9_conv'))
-      
+
       up2 = deconv3d_WN(h9,128,name='d_up2_deconv')
       up2 = tf.concat([h3,up2],4)
       h10 = lrelu(conv3d_WN(up2, 64, name='d_h10_conv'))
@@ -78,14 +78,14 @@ class model(object):
 
       h14 = conv3d_WN(h13, F.num_classes,name='d_h14_conv')
 
-      return h14,tf.nn.softmax(h14),h6
+      return h14,tf.nn.softmax(h14),[h0,h1,h2,h3,h4,h5,h6,h7,h8,h9,h10,h11,h12,h13]
 
   def generator(self, z, phase):
     """
     Parameters:
     * z - Noise vector for generating 3D patches
     * phase - boolean variable to represent phase of operation of batchnorm
-    Returns: 
+    Returns:
     * generated 3D patches
     """
     with tf.variable_scope('G') as scope:
@@ -96,13 +96,13 @@ class model(object):
       h0 = tf.reshape(h0, [F.batch_size, sh1, sh1, sh1, 512])
       h0 = relu(self.g_bns[0](h0,phase))
 
-      h1 = relu(self.g_bns[1](deconv3d(h0, [F.batch_size,sh2,sh2,sh2,256], 
+      h1 = relu(self.g_bns[1](deconv3d(h0, [F.batch_size,sh2,sh2,sh2,256],
                                                           name='g_h1_deconv'),phase))
 
-      h2 = relu(self.g_bns[2](deconv3d(h1, [F.batch_size,sh3,sh3,sh3,128], 
-                                                          name='g_h2_deconv'),phase))   
+      h2 = relu(self.g_bns[2](deconv3d(h1, [F.batch_size,sh3,sh3,sh3,128],
+                                                          name='g_h2_deconv'),phase))
 
-      h3 = relu(self.g_bns[3](deconv3d(h2, [F.batch_size,sh4,sh4,sh4,64], 
+      h3 = relu(self.g_bns[3](deconv3d(h2, [F.batch_size,sh4,sh4,sh4,64],
                                                           name='g_h3_deconv'),phase))
 
       h4 = deconv3d_WN(h3, F.num_mod, name='g_h4_deconv')
@@ -114,7 +114,7 @@ class model(object):
     Parameters:
     * patch - patches generated from the generator
     * phase - boolean variable to represent phase of operation of batchnorm
-    Returns: 
+    Returns:
     * splitted logits
     """
     with tf.variable_scope('E') as scope:
@@ -124,7 +124,7 @@ class model(object):
 
       h2 = tf.reshape(h2, [h2.shape[0],h2.shape[1]*h2.shape[2]*h2.shape[3]*h2.shape[4]])
       h3 = linear_WN(h2, F.noise_dim*2,'e_h3_lin')
-      
+
       h3 = tf.split(h3,2,1)
       return h3
 
@@ -134,9 +134,9 @@ class model(object):
 
   """
   def build_model(self):
-    self.patches_lab = tf.placeholder(tf.float32, [F.batch_size, self.patch_shape[0], 
+    self.patches_lab = tf.placeholder(tf.float32, [F.batch_size, self.patch_shape[0],
                                 self.patch_shape[1], self.patch_shape[2], F.num_mod], name='real_images_l')
-    self.patches_unlab = tf.placeholder(tf.float32, [F.batch_size, self.patch_shape[0], 
+    self.patches_unlab = tf.placeholder(tf.float32, [F.batch_size, self.patch_shape[0],
                                 self.patch_shape[1], self.patch_shape[2], F.num_mod], name='real_images_unl')
 
     self.z_gen = tf.placeholder(tf.float32, [None, F.noise_dim], name='noise')
@@ -150,7 +150,7 @@ class model(object):
     # To generate samples from noise
     self.patches_fake = self.generator(self.z_gen, self.phase)
 
-    # Forward pass through network with different kinds of training patches 
+    # Forward pass through network with different kinds of training patches
     self.D_logits_lab, self.D_probdist, _= self.discriminator(self.patches_lab, reuse=False)
     self.D_logits_unlab, _, self.features_unlab\
                        = self.discriminator(self.patches_unlab, reuse=True)
@@ -183,8 +183,8 @@ class model(object):
     self.d_loss = self.d_loss_lab + self.d_loss_unlab
 
     #Feature matching loss
-    self.g_loss_fm = tf.reduce_mean(tf.abs(tf.reduce_mean(self.features_unlab,0) \
-                                                  - tf.reduce_mean(self.features_fake,0)))
+    self.g_loss_fm = tf.reduce_mean(tf.abs(tf.reduce_mean(self.features_unlab[6],0) \
+                                                  - tf.reduce_mean(self.features_fake[6],0)))
 
     if F.badGAN:
       # Mean and standard deviation for variational inference loss
@@ -195,11 +195,11 @@ class model(object):
       self.g_loss = self.g_loss_fm + F.vi_weight * self.vi_loss
     else:
       # Total Generator Loss
-      self.g_loss = self.g_loss_fm 
+      self.g_loss = self.g_loss_fm
 
 
     t_vars = tf.trainable_variables()
-    
+
     #define the trainable variables
     self.d_vars = [var for var in t_vars if 'd_' in var.name]
     self.g_vars = [var for var in t_vars if 'g_' in var.name]
@@ -217,8 +217,8 @@ class model(object):
   def train(self):
 
     # Instantiate the dataset class
-    data = dataset_badGAN(num_classes=F.num_classes,extraction_step=self.extraction_step, 
-              number_images_training=F.number_train_images,batch_size=F.batch_size, 
+    data = dataset_badGAN(num_classes=F.num_classes,extraction_step=self.extraction_step,
+              number_images_training=F.number_train_images,batch_size=F.batch_size,
               patch_shape=self.patch_shape,number_unlab_images_training=F.number_train_unlab_images,
               data_directory=F.data_directory)
 
@@ -250,7 +250,7 @@ class model(object):
                                     F.num_classes,self.extraction_step,self.patch_shape,
                                     F.number_train_images,validating=F.training,
                                     testing=F.testing,num_images_testing=F.number_test_images)
-    
+
     predictions_val = np.zeros((patches_val.shape[0],self.patch_shape[0],self.patch_shape[1],
                                                               self.patch_shape[2]),dtype="uint8")
     max_par=0.0
@@ -269,7 +269,7 @@ class model(object):
         sample_z_gen = np.random.uniform(-1, 1, [F.batch_size, F.noise_dim]).astype(np.float32)
 
         _ = self.sess.run(d_optim,feed_dict={self.patches_lab:patches_lab,self.patches_unlab:patches_unlab,
-                                    self.z_gen:sample_z_gen,self.labels:labels, self.phase: True})  
+                                    self.z_gen:sample_z_gen,self.labels:labels, self.phase: True})
 
         if F.badGAN:
           _, _ = self.sess.run([e_optim,g_optim],feed_dict={self.patches_unlab:patches_unlab, self.z_gen:sample_z_gen,
@@ -279,9 +279,9 @@ class model(object):
                                                                   self.z_gen:sample_z_gen,self.phase: True})
 
         feed_dict = {self.patches_lab:patches_lab,self.patches_unlab:patches_unlab,
-                                    self.z_gen:sample_z_gen,self.labels:labels, self.phase: True} 
+                                    self.z_gen:sample_z_gen,self.labels:labels, self.phase: True}
 
-        # Evaluate losses for plotting/printing purposes   
+        # Evaluate losses for plotting/printing purposes
         d_loss_lab = self.d_loss_lab.eval(feed_dict)
         d_loss_unlab_true = self.true_loss.eval(feed_dict)
         d_loss_unlab_fake = self.fake_loss.eval(feed_dict)
@@ -363,7 +363,7 @@ class model(object):
         save_model(F.best_checkpoint_dir, self.sess, self.saver)
         print("Best checkpoint updated from validation results.")
 
-      # To save the losses for plotting 
+      # To save the losses for plotting
       print("Average Validation Loss:",avg_val_loss)
       with open('Val_loss_GAN.txt', 'a') as f:
         f.write('%.2e \n' % avg_val_loss)
