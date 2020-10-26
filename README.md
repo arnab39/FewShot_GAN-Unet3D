@@ -11,10 +11,10 @@ pip install -r requirement.txt
 - Install [ANTs N4BiasFieldCorrection](https://github.com/ANTsX/ANTs/releases) and add the location of the ANTs binaries to the PATH environmental variable.
 
 ## Dataset
-[iSEG 2017](http://iseg2017.web.unc.edu/) dataset was chosen to substantiate our proposed method. 
+[iSEG 2017](http://iseg2017.web.unc.edu/) dataset was chosen to substantiate our proposed method.
 It contains the 3D multi-modal brain MRI data of 10 labeled training subjects and 13 unlabeled testing subjects.
 We split the 10 labeled training data into training, validation and testing images for both the models.(Eg- 2,1 and 7)
-Rest of the 13 unlabeled testing images are only used for training the GAN based model. 
+Rest of the 13 unlabeled testing images are only used for training the GAN based model.
 
 ## How to use the code?
 * Download the iSEG-2017 data and place it in data folder. (Visit [this](http://iseg2017.web.unc.edu/download/) link to download the data. You need to register for the challenge.)
@@ -38,7 +38,7 @@ $ cd ../unet3D
 ```
 $ python main_unet.py --training
 ```
-* This will train your model and save the best checkpoint according to your validation performance. 
+* This will train your model and save the best checkpoint according to your validation performance.
 * You can also resume training from saved checkpoint by setting the load_chkpt flag.
 * You can run the testing to predict segmented output which will be saved in your result folder as ".nii.gz" files.
 * To run testing
@@ -47,8 +47,8 @@ $ python main_unet.py --testing
 ```
 * This version of code only compute dice coefficient to evaluate the testing performance.( Once the output segmented images are created you can use them to compute any other evaluation metric)
 * Note that the U-Net used here is modified according to the U-Net used in proposed model.(To stabilise the GAN training)
-* To use the original U-Net you need to change the replace network_dis with network(both networks are provided) in build_model function of class U-Net(in model_unet.py). 
- 
+* To use the original U-Net you need to change the replace network_dis with network(both networks are provided) in build_model function of class U-Net(in model_unet.py).
+
 ### How to run GAN based 3D U-Net?
 ```
 $ cd ../proposed_model
@@ -65,27 +65,27 @@ $ python main.py --training --badGAN
 * To run testing
 ```
 $ python main.py --testing
-``` 
-* Once you run both the model you can compare the difference between their perfomance when 1 or 2 training images are available. 
+```
+* Once you run both the model you can compare the difference between their perfomance when 1 or 2 training images are available.
 
 ## Proposed model architecture
 The following shows the model architecture of the proposed model. (Read our paper for further details)
 
 <br>
-<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Diagram.jpg" width="800"/>
+<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/tensorflow/images/Diagram.jpg" width="800"/>
 <br>
 
 ## Some results from our paper
 
 * Visual comparison of the segmentation by each model, for two test subjects of the iSEG-2017 dataset, when training with different numbers of labeled examples.
 <p float="left">
-  <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Subject9.jpg" width="420" />
-  <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/Subject10.jpg" width="420" /> 
+  <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/tensorflow/images/Subject9.jpg" width="420" />
+  <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/tensorflow/images/Subject10.jpg" width="420" />
 </p>
 
 * Segmentation of Subject 10 of the iSEG-2017 dataset predicted by different GAN-based models, when trained with 2 labeled images. The red box highlights a region in the ground truth where all these models give noticeable differences.
 <br>
-<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/images/ganwar_mod.jpg" width="820"/>
+<img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/tensorflow/images/ganwar_mod.jpg" width="820"/>
 <br>
 * More such results can be found in the paper.
 
@@ -93,5 +93,4 @@ The following shows the model architecture of the proposed model. (Read our pape
 You can mail me at: sanu.arnab@gmail.com  
 If you use this code for your research, please consider citing the original paper:
 
-- Arnab Kumar Mondal, Jose Dolz, Christian Desrosiers. [Few-shot 3D Multi-modal Medical Image Segmentation using Generative Adversarial Learning](https://arxiv.org/abs/1810.12241), submitted in Medical Image Analysis, October 2018.
-
+- Arnab Kumar Mondal, Jose Dolz, Christian Desrosiers. [Few-shot 3D Multi-modal Medical Image Segmentation using Generative Adversarial Learning](https://arxiv.org/abs/1810.12241).
