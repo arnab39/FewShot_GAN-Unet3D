@@ -22,10 +22,10 @@ flags.DEFINE_float("flw", 0.5, "Fake loss weight")
 flags.DEFINE_float("vi_weight", 0.01, "Weight of variational inference loss")
 
 flags.DEFINE_integer("number_train_images", 1, "No. of labeled images for training")
-flags.DEFINE_integer("number_train_unlab_images", 1, "No. of unlabeled images for training")
+flags.DEFINE_integer("number_train_unlab_images", 12, "No. of unlabeled images for training")
 flags.DEFINE_integer("number_test_images", 7, "No. of images for testing")
 
-flags.DEFINE_string("data_directory", "../../../../FewShot_GAN-Unet3D0/data/iSEG_preprocessed", "Directory name containing the dataset")
+flags.DEFINE_string("data_directory", "../data/iSEG_preprocessed", "Directory name containing the dataset")
 flags.DEFINE_string("checkpoint_dir", "checkpoint/current", "Directory name to save the checkpoints [checkpoint]")
 flags.DEFINE_string("best_checkpoint_dir", "checkpoint/best", "Directory name to save the best checkpoints [checkpoint]")
 flags.DEFINE_string("results_dir", "results/", "Directory name to save the results [results]")
@@ -34,6 +34,7 @@ flags.DEFINE_boolean("load_chkpt", False, "True for loading saved checkpoint")
 flags.DEFINE_boolean("training", False, "True for Training ")
 flags.DEFINE_boolean("testing", False, "True for Testing ")
 flags.DEFINE_boolean("badGAN", False, "True if you want to run badGAN based model ")
+flags.DEFINE_boolean("use_weighted_fm", False, "True if you want to run Weighted Feature Matching based model ")
 
 flags.DEFINE_integer("batch_size", 30, "The size of batch images [64]")
 

@@ -38,6 +38,21 @@ def load_model(checkpoint_dir, sess, saver):
   else:
     return False
 
+def compute_weighted_fm_loss(intermediate_layers):
+    intermediate_layers_unlab, intermediate_layers_fake = intermediate_layers
+    layers_distance = []
+    for i in range(len(intermediate_layers_unlab)):
+        normalized_dist = tf.reduce_mean(tf.abs(tf.reduce_mean(intermediate_layers_unlab[i],0) \
+                                                  - tf.reduce_mean(intermediate_layers_fake[i],0)))
+        layers_distance.append(normalized_dist)
+
+    layers_distance = tf.stack(layers_distance)
+    total_distance = tf.reduce_sum(layers_distance)
+    weights = tf.nn.softmax(-tf.log(layers_distance/total_distance))
+
+    loss = tf.reduce_sum(np.multiply(layers_distance, weights))
+    return loss, weights
+
 """
 To recompose an array of 3D images from patches
 """

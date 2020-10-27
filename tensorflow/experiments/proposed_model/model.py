@@ -183,8 +183,11 @@ class model(object):
     self.d_loss = self.d_loss_lab + self.d_loss_unlab
 
     #Feature matching loss
-    self.g_loss_fm = tf.reduce_mean(tf.abs(tf.reduce_mean(self.features_unlab[6],0) \
+    if not F.use_weighted_fm:
+        self.g_loss_fm = tf.reduce_mean(tf.abs(tf.reduce_mean(self.features_unlab[6],0) \
                                                   - tf.reduce_mean(self.features_fake[6],0)))
+    else:
+        self.g_loss_fm, _ = compute_weighted_fm_loss([self.features_unlab, self.features_fake])
 
     if F.badGAN:
       # Mean and standard deviation for variational inference loss
