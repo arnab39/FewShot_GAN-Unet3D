@@ -25,8 +25,8 @@ The following shows the model architecture of the proposed model. (Read our pape
 
 * Visual comparison of the segmentation by each model, for two test subjects of the iSEG-2017 dataset, when training with different numbers of labeled examples.
 <p float="left">
-  <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/tensorflow/images/train1.png" width="420" />
-  <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/tensorflow/images/train2.png" width="420" />
+  <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/tensorflow/images/train1.png" width="800" />
+  <img src="https://github.com/arnab39/FewShot_GAN-Unet3D/blob/master/tensorflow/images/train2.png" width="800" />
 </p>
 
 * Segmentation of Subject 10 of the iSEG-2017 dataset predicted by different GAN-based models, when trained with 2 labeled images. The red box highlights a region in the ground truth where all these models give noticeable differences.
