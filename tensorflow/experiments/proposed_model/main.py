@@ -25,7 +25,7 @@ flags.DEFINE_integer("number_train_images", 1, "No. of labeled images for traini
 flags.DEFINE_integer("number_train_unlab_images", 12, "No. of unlabeled images for training")
 flags.DEFINE_integer("number_test_images", 7, "No. of images for testing")
 
-flags.DEFINE_string("data_directory", "../../../../FewShot_GAN-Unet3D0/data/iSEG_preprocessed", "Directory name containing the dataset")
+flags.DEFINE_string("data_directory", "../data/iSEG_preprocessed", "Directory name containing the dataset")
 flags.DEFINE_string("checkpoint_dir", "checkpoint/current", "Directory name to save the checkpoints [checkpoint]")
 flags.DEFINE_string("best_checkpoint_dir", "checkpoint/best", "Directory name to save the best checkpoints [checkpoint]")
 flags.DEFINE_string("results_dir", "results/", "Directory name to save the results [results]")
