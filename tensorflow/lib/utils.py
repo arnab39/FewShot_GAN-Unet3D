@@ -38,6 +38,21 @@ def load_model(checkpoint_dir, sess, saver):
   else:
     return False
 
+def compute_weighted_fm_loss(intermediate_layers):
+    intermediate_layers_unlab, intermediate_layers_fake = intermediate_layers
+    layers_distance = []
+    for i in range(len(intermediate_layers_unlab)):
+        normalized_dist = tf.reduce_mean(tf.abs(tf.reduce_mean(intermediate_layers_unlab[i],0) \
+                                                  - tf.reduce_mean(intermediate_layers_fake[i],0)))
+        layers_distance.append(normalized_dist)
+
+    layers_distance = tf.stack(layers_distance)
+    total_distance = tf.reduce_sum(layers_distance)
+    weights = tf.nn.softmax(-tf.log(layers_distance/total_distance))
+
+    loss = tf.reduce_sum(np.multiply(layers_distance, weights))
+    return loss, weights
+
 """
 To recompose an array of 3D images from patches
 """
@@ -58,11 +73,11 @@ def recompose3D_overlap(preds, img_h, img_w, img_d, stride_h, stride_w, stride_d
   print("According to the dimension inserted, there are " \
           +str(N_full_imgs) +" full images (of " +str(img_h)+"x" +str(img_w)+"x" +str(img_d) +" each)")
   # itialize to zero mega array with sum of Probabilities
-  raw_pred_martrix = np.zeros((N_full_imgs,img_h,img_w,img_d)) 
+  raw_pred_martrix = np.zeros((N_full_imgs,img_h,img_w,img_d))
   raw_sum = np.zeros((N_full_imgs,img_h,img_w,img_d))
   final_matrix = np.zeros((N_full_imgs,img_h,img_w,img_d),dtype='uint16')
 
-  k = 0 
+  k = 0
   # iterator over all the patches
   for i in range(N_full_imgs):
     for h in range((img_h-patch_h)//stride_h+1):

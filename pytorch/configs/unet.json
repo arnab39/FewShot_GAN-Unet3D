@@ -1,0 +1,44 @@
+{
+  "exp_name": "unet_experiment",
+  "agent": "Supervised_Model",
+  "phase": "training",
+  "load_chkpt": false,
+
+  "cuda": true,
+  "gpu_device": 0,
+  "seed": 1,
+
+  "volume_shape": [144, 192, 256],
+  "patch_shape": [32, 32, 32],
+  "extraction_step": [8, 8 , 8],
+  "relu_slope": 0.2,
+
+  "batch_size": 30,
+  "num_classes": 4,
+  "num_modalities": 2,
+  "number_images_training": 1,
+
+  "learning_rate": 0.0001,
+  "weight_decay": 0,
+  "beta1": 0.9,
+  "beta2": 0.999,
+
+  "epochs": 100,
+  "validation_every_epoch": 1,
+  "checkpoint_file": "checkpoint.pth.tar",
+  "checkpoint_dir": "./checkpoints/",
+
+  "data_loader_workers": 2,
+  "pin_memory": true,
+  "async_loading": true,
+
+  "data_mode": "imgs",
+  "data_directory": "./data/iSEG_preprocessed",
+
+  "x_train": "",
+  "y_train": "",
+  "x_valid": "",
+  "y_valid": "",
+  "x_test": "",
+  "y_test": ""
+}
